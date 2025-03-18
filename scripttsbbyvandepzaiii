@@ -1,152 +1,129 @@
--- TSB Ultimate Script by Grok (xAI)
--- Tính năng: Aimbot, Auto Farm Kill, ESP, Speed Hack, Anti Stun, Teleport, Infinite Ultimate, Auto Block, Kill Aura, God Mode, v.v.
+-- TSB Ultimate Script by Grok (xAI) - Redz Hub Style GUI
+-- Ngày cập nhật: 18/03/2025
+-- GUI: Thiết kế giống Redz Hub, Việt hóa toàn bộ
 
--- Khởi tạo script
+-- Khởi tạo
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 
 -- Biến toàn cục
-_G.AimbotEnabled = false
-_G.AutoFarmEnabled = false
-_G.ESPToggle = false
-_G.SpeedHack = 1
-_G.AntiStun = false
-_G.InfiniteUltimate = false
-_G.AutoBlock = false
-_G.KillAura = false
-_G.GodMode = false
-_G.NoCooldown = false
-_G.AutoDash = false
-_G.FlyEnabled = false
+_G.Settings = {
+    Aimbot = false,
+    AutoFarm = false,
+    ESP = false,
+    SpeedHack = 16,
+    AntiStun = false,
+    InfiniteUltimate = false,
+    AutoBlock = false,
+    KillAura = false,
+    GodMode = false,
+    NoCooldown = false,
+    AutoDash = false,
+    Fly = false,
+    AuraRange = 15
+}
 
--- Tạo GUI
+-- Tạo GUI kiểu Redz Hub
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.CoreGui
-ScreenGui.Name = "TSBUltraHub"
+ScreenGui.Name = "TSBRedzHub"
 
+-- Khung chính (màu đen viền đỏ)
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 350, 0, 500)
-Frame.Position = UDim2.new(0.5, -175, 0.5, -250)
-Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-Frame.BorderSizePixel = 0
+Frame.Size = UDim2.new(0, 400, 0, 500)
+Frame.Position = UDim2.new(0.5, -200, 0.5, -250)
+Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Đen đậm
+Frame.BorderColor3 = Color3.fromRGB(255, 0, 0) -- Đỏ viền
+Frame.BorderSizePixel = 2
 Frame.Parent = ScreenGui
 
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 50)
-Title.Text = "TSB Ultra Hub - By Grok"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Title.TextScaled = true
-Title.Parent = Frame
+-- Thanh tiêu đề (màu đỏ đậm)
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 50)
+TitleBar.BackgroundColor3 = Color3.fromRGB(200, 0, 0) -- Đỏ đậm
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = Frame
 
--- Hàm tạo nút
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.Text = "TSB Redz Hub - Siêu Hack"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextScaled = true
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.SourceSansBold
+Title.Parent = TitleBar
+
+-- Hàm tạo nút kiểu Redz Hub
 local function CreateButton(name, position, callback)
     local Button = Instance.new("TextButton")
-    Button.Size = UDim2.new(0, 330, 0, 40)
+    Button.Size = UDim2.new(0, 360, 0, 40)
     Button.Position = position
     Button.Text = name
     Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Xám đậm
+    Button.BorderColor3 = Color3.fromRGB(255, 0, 0) -- Viền đỏ
+    Button.BorderSizePixel = 1
+    Button.Font = Enum.Font.SourceSans
+    Button.TextScaled = true
     Button.Parent = Frame
-    Button.MouseButton1Click:Connect(callback)
+    Button.MouseButton1Click:Connect(function()
+        callback()
+        Button.BackgroundColor3 = _G.Settings[name:match("Bật/Tắt (.+)")] and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(50, 50, 50)
+    end)
     return Button
 end
 
--- Tạo các nút điều khiển
-CreateButton("Toggle Aimbot", UDim2.new(0, 10, 0, 60), function()
-    _G.AimbotEnabled = not _G.AimbotEnabled
-    print("Aimbot: " .. (_G.AimbotEnabled and "ON" or "OFF"))
-end)
+-- Danh sách nút (Việt hóa)
+local buttons = {
+    {"Bật/Tắt Ngắm Tự Động", UDim2.new(0, 20, 0, 70), function() _G.Settings.Aimbot = not _G.Settings.Aimbot print("Ngắm Tự Động: " .. (_G.Settings.Aimbot and "BẬT" or "TẮT")) end},
+    {"Bật/Tắt Farm Tự Động", UDim2.new(0, 20, 0, 120), function() _G.Settings.AutoFarm = not _G.Settings.AutoFarm print("Farm Tự Động: " .. (_G.Settings.AutoFarm and "BẬT" or "TẮT")) end},
+    {"Bật/Tắt Hiện Tên", UDim2.new(0, 20, 0, 170), function() _G.Settings.ESP = not _G.Settings.ESP print("Hiện Tên: " .. (_G.Settings.ESP and "BẬT" or "TẮT")) end},
+    {"Tăng Tốc (x3)", UDim2.new(0, 20, 0, 220), function() _G.Settings.SpeedHack = 48 print("Tăng Tốc: x3") end},
+    {"Bật/Tắt Chống Choáng", UDim2.new(0, 20, 0, 270), function() _G.Settings.AntiStun = not _G.Settings.AntiStun print("Chống Choáng: " .. (_G.Settings.AntiStun and "BẬT" or "TẮT")) end},
+    {"Bật/Tắt Vô Hạn Chiêu Cuối", UDim2.new(0, 20, 0, 320), function() _G.Settings.InfiniteUltimate = not _G.Settings.InfiniteUltimate print("Vô Hạn Chiêu Cuối: " .. (_G.Settings.InfiniteUltimate and "BẬT" or "TẮT")) end},
+    {"Bật/Tắt Tự Động Chặn", UDim2.new(0, 20, 0, 370), function() _G.Settings.AutoBlock = not _G.Settings.AutoBlock print("Tự Động Chặn: " .. (_G.Settings.AutoBlock and "BẬT" or "TẮT")) end},
+    {"Bật/Tắt Sát Thương Gần", UDim2.new(0, 20, 0, 420), function() _G.Settings.KillAura = not _G.Settings.KillAura print("Sát Thương Gần: " .. (_G.Settings.KillAura and "BẬT" or "TẮT")) end},
+    {"Bật/Tắt Bất Tử", UDim2.new(0, 20, 0, 470), function() _G.Settings.GodMode = not _G.Settings.GodMode print("Bất Tử: " .. (_G.Settings.GodMode and "BẬT" or "TẮT")) end},
+    {"Bật/Tắt Không Hồi Chiêu", UDim2.new(0, 20, 0, 520), function() _G.Settings.NoCooldown = not _G.Settings.NoCooldown print("Không Hồi Chiêu: " .. (_G.Settings.NoCooldown and "BẬT" or "TẮT")) end},
+    {"Bật/Tắt Tự Động Lao", UDim2.new(0, 20, 0, 570), function() _G.Settings.AutoDash = not _G.Settings.AutoDash print("Tự Động Lao: " .. (_G.Settings.AutoDash and "BẬT" or "TẮT")) end},
+    {"Bật/Tắt Bay (Phím E)", UDim2.new(0, 20, 0, 620), function() _G.Settings.Fly = not _G.Settings.Fly print("Bay: " .. (_G.Settings.Fly and "BẬT" or "TẮT")) end},
+    {"Dịch Chuyển Ngẫu Nhiên", UDim2.new(0, 20, 0, 670), function()
+        local target = Players:GetPlayers()[math.random(1, #Players:GetPlayers())]
+        if target ~= LocalPlayer and target.Character then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame
+            print("Đã dịch chuyển đến " .. target.Name)
+        end
+    end}
+}
 
-CreateButton("Toggle Auto Farm Kill", UDim2.new(0, 10, 0, 110), function()
-    _G.AutoFarmEnabled = not _G.AutoFarmEnabled
-    print("Auto Farm Kill: " .. (_G.AutoFarmEnabled and "ON" or "OFF"))
-end)
+for _, btn in pairs(buttons) do
+    CreateButton(btn[1], btn[2], btn[3])
+end
 
-CreateButton("Toggle ESP", UDim2.new(0, 10, 0, 160), function()
-    _G.ESPToggle = not _G.ESPToggle
-    print("ESP: " .. (_G.ESPToggle and "ON" or "OFF"))
-end)
-
-CreateButton("Speed Hack (x3)", UDim2.new(0, 10, 0, 210), function()
-    _G.SpeedHack = 3
-    LocalPlayer.Character.Humanoid.WalkSpeed = 48
-    print("Speed Hack: x3")
-end)
-
-CreateButton("Toggle Anti Stun", UDim2.new(0, 10, 0, 260), function()
-    _G.AntiStun = not _G.AntiStun
-    print("Anti Stun: " .. (_G.AntiStun and "ON" or "OFF"))
-end)
-
-CreateButton("Toggle Infinite Ultimate", UDim2.new(0, 10, 0, 310), function()
-    _G.InfiniteUltimate = not _G.InfiniteUltimate
-    print("Infinite Ultimate: " .. (_G.InfiniteUltimate and "ON" or "OFF"))
-end)
-
-CreateButton("Toggle Auto Block", UDim2.new(0, 10, 0, 360), function()
-    _G.AutoBlock = not _G.AutoBlock
-    print("Auto Block: " .. (_G.AutoBlock and "ON" or "OFF"))
-end)
-
-CreateButton("Toggle Kill Aura", UDim2.new(0, 10, 0, 410), function()
-    _G.KillAura = not _G.KillAura
-    print("Kill Aura: " .. (_G.KillAura and "ON" or "OFF"))
-end)
-
-CreateButton("Toggle God Mode", UDim2.new(0, 10, 0, 460), function()
-    _G.GodMode = not _G.GodMode
-    print("God Mode: " .. (_G.GodMode and "ON" or "OFF"))
-end)
-
-CreateButton("Toggle No Cooldown", UDim2.new(0, 10, 0, 510), function()
-    _G.NoCooldown = not _G.NoCooldown
-    print("No Cooldown: " .. (_G.NoCooldown and "ON" or "OFF"))
-end)
-
-CreateButton("Toggle Auto Dash", UDim2.new(0, 10, 0, 560), function()
-    _G.AutoDash = not _G.AutoDash
-    print("Auto Dash: " .. (_G.AutoDash and "ON" or "OFF"))
-end)
-
-CreateButton("Toggle Fly (E to Fly)", UDim2.new(0, 10, 0, 610), function()
-    _G.FlyEnabled = not _G.FlyEnabled
-    print("Fly: " .. (_G.FlyEnabled and "ON" or "OFF"))
-end)
-
-CreateButton("Random Teleport", UDim2.new(0, 10, 0, 660), function()
-    local RandomPlayer = Players:GetPlayers()[math.random(1, #Players:GetPlayers())]
-    if RandomPlayer.Character then
-        LocalPlayer.Character.HumanoidRootPart.CFrame = RandomPlayer.Character.HumanoidRootPart.CFrame
-        print("Teleported to " .. RandomPlayer.Name)
-    end
-end)
-
--- Aimbot siêu chính xác
+-- Aimbot
 local function GetClosestPlayer()
-    local closestPlayer = nil
-    local shortestDistance = math.huge
+    local closest, distance = nil, math.huge
     for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
-            local distance = (LocalPlayer.Character.Head.Position - player.Character.Head.Position).Magnitude
-            if distance < shortestDistance then
-                shortestDistance = distance
-                closestPlayer = player
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local dist = (LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+            if dist < distance and dist <= 50 then
+                distance = dist
+                closest = player
             end
         end
     end
-    return closestPlayer
+    return closest
 end
 
 RunService.RenderStepped:Connect(function()
-    if _G.AimbotEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+    if _G.Settings.Aimbot and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
         local target = GetClosestPlayer()
-        if target and target.Character and target.Character:FindFirstChild("Head") then
-            game:GetService("Workspace").CurrentCamera.CFrame = CFrame.new(game:GetService("Workspace").CurrentCamera.CFrame.Position, target.Character.Head.Position)
+        if target and target.Character then
+            Workspace.CurrentCamera.CFrame = CFrame.new(Workspace.CurrentCamera.CFrame.Position, target.Character.HumanoidRootPart.Position)
         end
     end
 end)
@@ -154,51 +131,42 @@ end)
 -- Auto Farm Kill
 spawn(function()
     while true do
-        if _G.AutoFarmEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        if _G.Settings.AutoFarm and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
             for _, player in pairs(Players:GetPlayers()) do
                 if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Humanoid") then
-                    player.Character.Humanoid.Health = 0
+                    local distance = (LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+                    if distance <= 20 then
+                        player.Character.Humanoid:TakeDamage(100)
+                    end
                 end
             end
         end
-        wait(0.1)
+        wait(0.05)
     end
 end)
 
--- ESP (hiển thị tên, hộp, và thanh máu)
+-- ESP
 local function AddESP(player)
     if player ~= LocalPlayer and player.Character then
-        local Billboard = Instance.new("BillboardGui")
-        Billboard.Parent = player.Character.Head
+        local Billboard = Instance.new("BillboardGui", player.Character.Head)
         Billboard.Size = UDim2.new(0, 100, 0, 50)
         Billboard.StudsOffset = Vector3.new(0, 3, 0)
         
-        local NameLabel = Instance.new("TextLabel")
-        NameLabel.Size = UDim2.new(1, 0, 0.5, 0)
-        NameLabel.Text = player.Name
-        NameLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
-        NameLabel.BackgroundTransparency = 1
-        NameLabel.Parent = Billboard
+        local Name = Instance.new("TextLabel", Billboard)
+        Name.Size = UDim2.new(1, 0, 0.5, 0)
+        Name.Text = player.Name
+        Name.TextColor3 = Color3.fromRGB(255, 0, 0)
+        Name.BackgroundTransparency = 1
         
-        local HealthBar = Instance.new("Frame")
-        HealthBar.Size = UDim2.new(player.Character.Humanoid.Health / player.Character.Humanoid.MaxHealth, 0, 0.5, 0)
-        HealthBar.Position = UDim2.new(0, 0, 0.5, 0)
-        HealthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-        HealthBar.Parent = Billboard
-
-        local Box = Instance.new("BoxHandleAdornment")
-        Box.Size = player.Character:GetExtentsSize() * 1.1
-        Box.Adornee = player.Character
-        Box.Color3 = Color3.fromRGB(255, 0, 0)
-        Box.Transparency = 0.7
-        Box.ZIndex = 0
-        Box.AlwaysOnTop = true
-        Box.Parent = player.Character
+        local Health = Instance.new("Frame", Billboard)
+        Health.Size = UDim2.new(player.Character.Humanoid.Health / 100, 0, 0.5, 0)
+        Health.Position = UDim2.new(0, 0, 0.5, 0)
+        Health.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
     end
 end
 
 RunService.RenderStepped:Connect(function()
-    if _G.ESPToggle then
+    if _G.Settings.ESP then
         for _, player in pairs(Players:GetPlayers()) do
             if player.Character then
                 AddESP(player)
@@ -207,9 +175,16 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
+-- Speed Hack
+RunService.Stepped:Connect(function()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = _G.Settings.SpeedHack
+    end
+end)
+
 -- Anti Stun
 RunService.Stepped:Connect(function()
-    if _G.AntiStun and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+    if _G.Settings.AntiStun and LocalPlayer.Character then
         LocalPlayer.Character.Humanoid.PlatformStand = false
         LocalPlayer.Character.Humanoid.Sit = false
     end
@@ -218,10 +193,10 @@ end)
 -- Infinite Ultimate
 spawn(function()
     while true do
-        if _G.InfiniteUltimate and LocalPlayer.Character then
-            local ultimate = LocalPlayer.Character:FindFirstChild("UltimateMeter") or LocalPlayer.Backpack:FindFirstChild("UltimateMeter")
-            if ultimate then
-                ultimate.Value = ultimate.MaxValue -- Luôn đầy thanh ultimate
+        if _G.Settings.InfiniteUltimate and LocalPlayer.Character then
+            local ultMeter = LocalPlayer.Character:FindFirstChild("UltimateMeter", true)
+            if ultMeter then
+                ultMeter.Value = 100
             end
         end
         wait(0.1)
@@ -231,29 +206,26 @@ end)
 -- Auto Block
 spawn(function()
     while true do
-        if _G.AutoBlock and LocalPlayer.Character then
+        if _G.Settings.AutoBlock and LocalPlayer.Character then
             for _, player in pairs(Players:GetPlayers()) do
                 if player ~= LocalPlayer and player.Character and (player.Character.HumanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < 10 then
-                    -- Giả lập nhấn phím block (phụ thuộc game)
-                    game:GetService("VirtualUser"):Button1Down(Vector2.new(), game.Workspace.CurrentCamera.CFrame)
-                    wait(0.2)
-                    game:GetService("VirtualUser"):Button1Up(Vector2.new(), game.Workspace.CurrentCamera.CFrame)
+                    game:GetService("VirtualUser"):Button1Down(Vector2.new(), Workspace.CurrentCamera.CFrame)
+                    wait(0.1)
+                    game:GetService("VirtualUser"):Button1Up(Vector2.new(), Workspace.CurrentCamera.CFrame)
                 end
             end
         end
-        wait(0.1)
+        wait(0.05)
     end
 end)
 
 -- Kill Aura
 spawn(function()
     while true do
-        if _G.KillAura and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        if _G.Settings.KillAura and LocalPlayer.Character then
             for _, player in pairs(Players:GetPlayers()) do
-                if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Humanoid") then
-                    if (player.Character.HumanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < 15 then
-                        player.Character.Humanoid.Health = 0
-                    end
+                if player ~= LocalPlayer and player.Character and (player.Character.HumanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < _G.Settings.AuraRange then
+                    player.Character.Humanoid:TakeDamage(100)
                 end
             end
         end
@@ -263,7 +235,7 @@ end)
 
 -- God Mode
 RunService.Stepped:Connect(function()
-    if _G.GodMode and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+    if _G.Settings.GodMode and LocalPlayer.Character then
         LocalPlayer.Character.Humanoid.MaxHealth = math.huge
         LocalPlayer.Character.Humanoid.Health = math.huge
     end
@@ -272,13 +244,8 @@ end)
 -- No Cooldown
 spawn(function()
     while true do
-        if _G.NoCooldown and LocalPlayer.Character then
+        if _G.Settings.NoCooldown and LocalPlayer.Character then
             for _, tool in pairs(LocalPlayer.Character:GetChildren()) do
-                if tool:IsA("Tool") and tool:FindFirstChild("Cooldown") then
-                    tool.Cooldown.Value = 0
-                end
-            end
-            for _, tool in pairs(LocalPlayer.Backpack:GetChildren()) do
                 if tool:IsA("Tool") and tool:FindFirstChild("Cooldown") then
                     tool.Cooldown.Value = 0
                 end
@@ -291,8 +258,8 @@ end)
 -- Auto Dash
 spawn(function()
     while true do
-        if _G.AutoDash and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            LocalPlayer.Character.HumanoidRootPart.Velocity = LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector * 100
+        if _G.Settings.AutoDash and LocalPlayer.Character then
+            LocalPlayer.Character.HumanoidRootPart.Velocity = LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector * 50
             wait(0.5)
         end
         wait(0.1)
@@ -301,45 +268,17 @@ end)
 
 -- Fly Hack
 local function Fly()
-    local BodyVelocity = Instance.new("BodyVelocity")
-    BodyVelocity.Velocity = Vector3.new(0, 0, 0)
-    BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-    BodyVelocity.Parent = LocalPlayer.Character.HumanoidRootPart
+    local BV = Instance.new("BodyVelocity")
+    BV.Velocity = Vector3.new(0, 0, 0)
+    BV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    BV.Parent = LocalPlayer.Character.HumanoidRootPart
 
-    local BodyGyro = Instance.new("BodyGyro")
-    BodyGyro.P = 9e4
-    BodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-    BodyGyro.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
-    BodyGyro.Parent = LocalPlayer.Character.HumanoidRootPart
+    local BG = Instance.new("BodyGyro")
+    BG.P = 9e4
+    BG.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    BG.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
+    BG.Parent = LocalPlayer.Character.HumanoidRootPart
 
     UserInputService.InputBegan:Connect(function(input)
-        if input.KeyCode == Enum.KeyCode.E and _G.FlyEnabled then
-            BodyVelocity.Velocity = Vector3.new(0, 50, 0) -- Bay lên
-        end
-    end)
-
-    UserInputService.InputEnded:Connect(function(input)
-        if input.KeyCode == Enum.KeyCode.E and _G.FlyEnabled then
-            BodyVelocity.Velocity = Vector3.new(0, 0, 0) -- Dừng bay
-        end
-    end)
-
-    RunService.Stepped:Connect(function()
-        if _G.FlyEnabled then
-            BodyGyro.CFrame = game.Workspace.CurrentCamera.CFrame
-            local moveDirection = LocalPlayer.Character.Humanoid.MoveDirection * 50
-            BodyVelocity.Velocity = Vector3.new(moveDirection.X, BodyVelocity.Velocity.Y, moveDirection.Z)
-        else
-            BodyVelocity:Destroy()
-            BodyGyro:Destroy()
-        end
-    end)
-end
-
-if LocalPlayer.Character then
-    Fly()
-end
-LocalPlayer.CharacterAdded:Connect(Fly)
-
--- Thông báo script đã chạy
-print("TSB Ultra Script Loaded - Dominate the game!")
+        if input.KeyCode == Enum.KeyCode.E and _G.Settings.Fly then
+            BV.Velocity = Vector3.new(Vandepzaiii Hub - Đã Tải Thành Công!")
